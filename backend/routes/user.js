@@ -6,10 +6,10 @@ const authController = require('../controllers/auth');
 
 const authMiddleware = require('../middleware/auth');
 
-router.param('id', userController.getUserById);
+router.param('/id', userController.getUserById);
 
-router.get('/secret/:id', authMiddleware.requireAuth, authMiddleware.isAuthed, (res, req, next) => {
+router.get('/:id', authMiddleware.requireAuth, authMiddleware.isAuthed, userController.getUser);
 
-});
+router.put('/:id', authMiddleware.requireAuth, authMiddleware.isAuthed, userController.putUser);
 
 module.exports = router;

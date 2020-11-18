@@ -6,6 +6,8 @@ const authMiddleware = require("../middleware/auth");
 
 router.param("/:id", productController.getProductById);
 
+router.get('', productController.getAllProducts);
+router.get('/related/:id', productController.getRelatedProducts);
 router.get("/:id", productController.getProduct);
 
 router.post(
@@ -15,6 +17,8 @@ router.post(
   authMiddleware.isAdmin,
   productController.postProduct
 );
+router.post("/by/search", productController.getProductsBySearch);
+
 
 router.put(
   "/:id/:userId",

@@ -20,20 +20,26 @@ const ProductSchema = new mongoose.Schema(
       required: true
     },
     category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
     },
     quantity: {
-        type: Number
+      type: Number
     },
-    photos: [{
+    sold: {
+      type: Number,
+      default: 0
+    },
+    photos: [
+      {
         data: Buffer,
         contentType: String
-    }],
+      }
+    ],
     shipping: {
-        required: false,
-        type: Boolean
+      required: false,
+      type: Boolean
     }
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
@@ -42,10 +48,7 @@ const ProductSchema = new mongoose.Schema(
 mongoose.plugin(uniqueValidator);
 
 class ProductClass {
-
-    delete () {
-        
-    }
+  delete() {}
 }
 
 ProductSchema.loadClass(ProductClass);

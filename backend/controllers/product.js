@@ -34,6 +34,82 @@ exports.getProduct = (req, res, next) => {
   });
 };
 
+exports.getAllProducts = (req, res, next) => {};
+
+exports.getRelatedProducts = (req, res, next) => {
+  const limit = req.query.limit ? parseInt(req.query.limit) : 6;
+
+  Product.find({ _id: { $ne: req.product }, category: req.product.category })
+    .limit(limit)
+    .populate("category", "_id name")
+    .exec()
+    .then(products => {
+      if (typeof products === "undefined" || products === null) {
+        res.status(400).json({
+          error: "Related products not found"
+        });
+      }
+      return res.status(200).json({
+        message: "Successfully got related products",
+        data: products
+      });
+    })
+    .catch(err => {
+      return res.status(400).json({
+        error: erroHandler(err)
+      });
+    });
+};
+
+exports.getProductsBySearch = (req, res, next) => {
+  let order = req.body.order ? req.body.order : "desc";
+  let sortBy = req.body.sortBy ? req.body.sortBy : "_id";
+  let limit = req.body.limit ? parseInt(req.body.limit) : 100;
+  let skip = parseInt(req.body.skip);
+  let findArgs = {};
+
+  // console.log(order, sortBy, limit, skip, req.body.filters);
+  // console.log("findArgs", findArgs);
+
+  for (let key in req.body.filters) {
+      if (req.body.filters[key].length > 0) {
+          if (key === "price") {
+              // gte -  greater than price [0-10]
+              // lte - less than
+              findArgs[key] = {
+                  $gte: req.body.filters[key][0],
+                  $lte: req.body.filters[key][1]
+              };
+          } else {
+              findArgs[key] = req.body.filters[key];
+          }
+      }
+  }
+
+  Product.find(findArgs)
+      .select("-photo")
+      .populate("category")
+      .sort([[sortBy, order]])
+      .skip(skip)
+      .limit(limit)
+      .exec().then(response => {
+        res.status(200).json({
+          message: 'Successfully got products',
+          data: {
+            size: response.length,
+            product: response
+          }
+      });
+      }).catch(err => {
+          if (err) {
+              return res.status(400).json({
+                  error: "Products not found"
+              });
+          }
+
+      });
+};
+
 exports.postProduct = (req, res, next) => {
   let form = new formidable.IncomingForm();
   form.keepExtensions = true;
@@ -107,7 +183,7 @@ exports.putProduct = (req, res, next) => {
 
     let product = req.product;
 
-    product = _.extend(product, feilds)
+    product = _.extend(product, feilds);
 
     if (files.photos) {
       files.photos.forEach(photo => {
@@ -154,3 +230,12 @@ exports.deleteProduct = (req, res, next) => {
       });
     });
 };
+
+exports.photos = (req, res, next) => {
+  if (req.product.photos) {
+    // res.set('Content-Type', req.product.photos.contentType)
+    return res.send(req.product.photos);
+  }
+
+  next();
+}
