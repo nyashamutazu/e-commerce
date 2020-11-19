@@ -1,21 +1,23 @@
 const User = require("../models/User");
 const passport = require("passport");
 
-const erroHandler = require("../helpers/dbErrorHandler");
+const {errorHandler} = require("../helpers/dbErrorHandler");
 
 exports.postUserSignUp = (req, res, next) => {
+  console.log('Starting');
+
   const userData = {
     name: req.body.name,
     email: req.body.email,
-    password: req.body.password
   };
   const user = new User(userData);
+
+  user.salt = undefined;
+  user.setPassword(req.body.password)
 
   user
     .save()
     .then(user => {
-      user.salt = undefined;
-      user;
       return res.status(200).json({
         message: "Successfully created user",
         data: user.toAuthJSON()
@@ -23,7 +25,7 @@ exports.postUserSignUp = (req, res, next) => {
     })
     .catch(err => {
       return res.status(400).json({
-        error: erroHandler(err)
+        error: errorHandler(err)
       });
     });
 };

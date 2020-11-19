@@ -1,0 +1,77 @@
+To Do
+
+------ Components ------
+
+1) Nav
+    - Basket
+    - Logo
+    - Menu
+    - Search
+    - User
+
+------ Icons ------
+Nav
+    - Logo
+    - Menu 
+    - Search
+    - Basket
+    - User
+    - Comment
+    - Flag
+    - User
+    - Image Icons
+    - Edit 
+    - Book
+    - Like
+    - Comment
+    - Friends
+    - Settings
+    - Sign Up/ In
+        - Google
+
+
+------ SCSS ------
+Content
+    - Typography
+        * heading
+            = style
+            = size
+
+        * paragraph 
+            = style
+            = size
+    - Images
+        * icons
+            = colour
+            = size
+    
+Layout
+    - container
+        * page
+        * button 
+        * group
+    - grid
+
+Components
+    - alerts
+    - badge 
+    - breadcrumb
+    - buttons
+    - button groups
+    - card 
+    - slider
+    - dropdown
+    - forms
+    - input  
+    - input groups 
+    - banner
+    - list group 
+    - modal 
+    - nav 
+    - pagination 
+    - progress
+    - tooltips
+
+Utilities
+    - shadows
+    - 
