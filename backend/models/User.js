@@ -40,7 +40,6 @@ const UserSchema = new mongoose.Schema(
 mongoose.plugin(uniqueValidator);
 
 class UserClass {
-
   validatePassword(password) {
     return this.encryptPassword(password) === this.hashed_password;
   }

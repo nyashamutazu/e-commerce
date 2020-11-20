@@ -1,50 +1,114 @@
 import React, { useState } from "react";
-import { API } from "../config";
+import {Link} from 'react-router-dom';
+
 import AuthLayout from "../core/shared/layout/AuthLayout";
+import Spinner from "../core/shared/spinner/Spinner";
+import { signup } from "../auth";
 
 const SignUp = () => {
   const [base, setBase] = useState({
     name: "",
     email: "",
     password: "",
-    repeatPassword: "",
+    repeat_password: "",
     checkbox: false,
     error: "",
     success: false,
-    isLoading: ""
+    isLoading: false
   });
 
-  const { name, email, password } = base;
-
-  const signup = (name, email, password) => {
-    const user = { name, email, password };
-
-    fetch(`${API}/auth/sign-up`, {
-      method: "POST",
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: "application/json",
-      },
-      body: JSON.stringify(user)
-    })
-      .then(response => response.json())
-      .then(response => {
-        console.log('Success')
-        console.log(response)})
-      .catch(err => {
-        console.log('Failed')
-        console.log(err)});
-  };
+  const {
+    name,
+    email,
+    password,
+    repeat_password,
+    checkbox,
+    isLoading,
+    error,
+    success
+  } = base;
 
   const handleSubmit = ev => {
     ev.preventDefault();
-    signup(name, email, password);
+
+    setBase({ ...base, isLoading: true });
+
+    if (!checkbox) {
+      setBase({ ...base, error: 'Please read and confirm you agree with our Terms of Service and our Privacy Policy', isLoading: false });
+      return;
+    }
+
+    if (!(password && repeat_password)) {
+      setBase({ ...base, error: 'Please enter a password and correctly repeat password', isLoading: false });
+      return;
+    }
+
+    if (password !== repeat_password) {
+      setBase({ ...base, error: 'Passwords must match', isLoading: false });
+      return;
+    }
+     
+    const user = {name, email, password}
+    signup(user)
+      .then(response => {
+        if (response.error) {
+          setBase({
+            ...base,
+            error: response.error,
+            success: false,
+            isLoading: false
+          });
+        } else {
+          setBase({
+            ...base,
+            name: "",
+            email: "",
+            password: "",
+            repeat_password: "",
+            checkbox: false,
+            success: true,
+            isLoading: false
+          });
+        }
+      })
+      .catch(err => {
+        setBase({
+          ...base,
+          error: "Failed to sign up please try again later",
+          success: false,
+          isLoading: false
+        });
+      });
   };
 
   const handleChange = value => ev => {
     ev.preventDefault();
     setBase({ ...base, error: false, [value]: ev.target.value });
+  };
+
+  const requestIsLoading = () => {
+    <div>
+      <Spinner />
+    </div>;
+  };
+
+  const displayError = () => {
+    return error ? (
+      <div>
+        <p>{error}</p>
+      </div>
+    ) : null;
+  };
+
+  const displaySuccess = () => {
+    return success ? (
+      <div>
+        <p>
+          Your new account has been created. Please{" "}
+          <Link to="/sign-in">Sign in</Link>
+        </p>
+      </div>
+    ) : null;
   };
 
   const alternativeSignUp = () => (
@@ -69,6 +133,8 @@ const SignUp = () => {
           <input
             onChange={handleChange("name")}
             type="text"
+            value={name}
+            autoComplete="name"
             className="form__input"
           />
         </div>
@@ -79,6 +145,8 @@ const SignUp = () => {
           <input
             onChange={handleChange("email")}
             type="email"
+            value={email}
+            autoComplete="email"
             className="form__input"
           />
         </div>
@@ -89,6 +157,8 @@ const SignUp = () => {
           <input
             onChange={handleChange("password")}
             type="password"
+            value={password}
+            autoComplete="new-password"
             className="form__input"
           />
         </div>
@@ -97,8 +167,10 @@ const SignUp = () => {
         <div className="form__controller--input">
           <label className="form__label">Re-enter Password</label>
           <input
-            onChange={handleChange("repeatPassword")}
+            onChange={handleChange("repeat_password")}
             type="password"
+            value={repeat_password}
+            autoComplete="new-password"
             className="form__input"
           />
         </div>
@@ -108,6 +180,7 @@ const SignUp = () => {
           <input
             onChange={handleChange("checkbox")}
             type="checkbox"
+            value={checkbox}
             className="form__input--checkbox"
           />
           <p className="text__small">
@@ -126,8 +199,18 @@ const SignUp = () => {
   return (
     <div>
       <AuthLayout title="Sign Up">
-          {alternativeSignUp()}
-          {signUpForm()}
+        {displayError()}
+        {displaySuccess()}
+
+
+        {isLoading && !success ? (
+          requestIsLoading()
+        ) : (
+          <div>
+            {alternativeSignUp()}
+            {signUpForm()}
+          </div>
+        )}
       </AuthLayout>
     </div>
   );

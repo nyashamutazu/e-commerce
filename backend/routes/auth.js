@@ -4,7 +4,7 @@ const router = express.Router();
 const authController = require('../controllers/auth');
 const indexValidation = require('../validator/index')
 
-router.get('/signout', authController.getUserSignOut);
+router.get('/sign-out', authController.getUserSignOut);
 
 router.post('/sign-up', indexValidation.userSignupValidator , authController.postUserSignUp);
 router.post('/sign-in', authController.postUserSignIn)
